@@ -1,0 +1,31 @@
+{
+  "name": "api-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Stateless remote MCP server that exposes a tenant HTTP API through Cloudflare Code Mode search and execute tools.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "test": "vitest run",
+    "typecheck": "node -e \"const fs=require('fs'); if(!fs.existsSync('.dev.vars')) fs.copyFileSync('.dev.vars.example','.dev.vars');\" && wrangler types src/env.d.ts --include-runtime false && tsc --noEmit",
+    "cf-typegen": "wrangler types src/env.d.ts --include-runtime false",
+    "inspector": "npx --yes @modelcontextprotocol/inspector@latest --config mcp-inspector.json"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "@cloudflare/codemode": "^0.5.1",
+    "@modelcontextprotocol/sdk": "1.30.0",
+    "agents": "^0.21.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260826.1",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.8.0",
+    "vitest": "^3.2.0",
+    "wrangler": "^4.0.0"
+  }
+}
