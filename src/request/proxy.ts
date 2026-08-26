@@ -80,7 +80,11 @@ export function assertSafeRelativePath(path: string): string {
     throw new Error("API path is not a valid URL path");
   }
 
-  if (splitPath(decoded).some((segment) => segment === ".." || segment === ".")) {
+  // WHATWG http(s) parsers treat `\` as `/` and then resolve `.` / `..`.
+  if (
+    decoded.includes("\\") ||
+    splitPath(decoded).some((segment) => segment === ".." || segment === ".")
+  ) {
     throw new Error("API path must not contain traversal segments");
   }
   return path;

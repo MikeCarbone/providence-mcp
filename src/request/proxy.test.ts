@@ -89,6 +89,15 @@ describe("assertSafeRelativePath", () => {
     expect(() => assertSafeRelativePath("/v1/%2e%2e/openapi.json")).toThrow(
       "API path must not contain traversal segments",
     );
+    expect(() =>
+      assertSafeRelativePath("/v1/accounts/..\\..\\v1\\auth\\token"),
+    ).toThrow("API path must not contain traversal segments");
+    expect(() =>
+      assertSafeRelativePath("/v1/symbols/..%5c..%5cv1%5cauth%5ctoken/bars"),
+    ).toThrow("API path must not contain traversal segments");
+    expect(() => assertSafeRelativePath("/v1/symbols/foo\\bar/bars")).toThrow(
+      "API path must not contain traversal segments",
+    );
   });
 });
 
@@ -123,6 +132,24 @@ describe("createHostRequest", () => {
     await expect(
       request({ method: "GET", path: "/v1/auth/token" }),
     ).rejects.toThrow("API path is not available on this server");
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("rejects backslash paths that would resolve outside the spec allowlist", async () => {
+    const fetchImpl = vi.fn();
+    const request = hostRequest(fetchImpl);
+    await expect(
+      request({
+        method: "GET",
+        path: "/v1/symbols/..\\..\\v1\\auth\\token/bars",
+      }),
+    ).rejects.toThrow("API path must not contain traversal segments");
+    await expect(
+      request({
+        method: "GET",
+        path: "/v1/symbols/..%5c..%5cv1%5cauth%5ctoken/bars",
+      }),
+    ).rejects.toThrow("API path must not contain traversal segments");
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 
