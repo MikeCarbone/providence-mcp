@@ -60,11 +60,14 @@ export function isPathInSpec(
 }
 
 export function assertSafeRelativePath(path: string): string {
-  if (typeof path !== "string" || !path.startsWith("/")) {
+  if (typeof path !== "string") {
     throw new Error("API path must start with a slash");
   }
   if (path.startsWith("//") || /^[a-z][a-z0-9+.-]*:/i.test(path)) {
     throw new Error("API path must be a relative URL path");
+  }
+  if (!path.startsWith("/")) {
+    throw new Error("API path must start with a slash");
   }
   if (path.includes("?") || path.includes("#")) {
     throw new Error("API path must not include a query or fragment");

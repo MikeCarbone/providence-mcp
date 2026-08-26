@@ -8,7 +8,7 @@
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
     "test": "vitest run",
-    "typecheck": "wrangler types src/env.d.ts --include-runtime false && tsc --noEmit",
+    "typecheck": "node -e \"const fs=require('fs'); if(!fs.existsSync('.dev.vars')) fs.copyFileSync('.dev.vars.example','.dev.vars');\" && wrangler types src/env.d.ts --include-runtime false && tsc --noEmit",
     "cf-typegen": "wrangler types src/env.d.ts --include-runtime false",
     "inspector": "npx --yes @modelcontextprotocol/inspector@latest --config mcp-inspector.json"
   },

@@ -127,16 +127,18 @@ describe("createHostRequest", () => {
   });
 
   it("only fetches API_BASE + path and forwards host Authorization", async () => {
-    const fetchImpl = vi.fn(async (input: URL | RequestInfo) => {
-      const url = new URL(String(input));
-      expect(url.toString()).toBe(
-        "https://api.example.com/v1/symbols/AAPL/bars?from=2026-08-01",
-      );
-      return new Response(JSON.stringify({ close: 1 }), {
-        status: 200,
-        headers: { "content-type": "application/json" },
-      });
-    });
+    const fetchImpl = vi.fn(
+      async (input: URL | RequestInfo, _init?: RequestInit) => {
+        const url = new URL(String(input));
+        expect(url.toString()).toBe(
+          "https://api.example.com/v1/symbols/AAPL/bars?from=2026-08-01",
+        );
+        return new Response(JSON.stringify({ close: 1 }), {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        });
+      },
+    );
     const request = hostRequest(fetchImpl);
     const result = await request({
       method: "GET",
@@ -151,8 +153,8 @@ describe("createHostRequest", () => {
 
     expect(result).toEqual({ status: 200, ok: true, result: { close: 1 } });
     expect(fetchImpl).toHaveBeenCalledTimes(1);
-    const init = fetchImpl.mock.calls[0]![1] as RequestInit;
-    const headers = new Headers(init.headers);
+    const init = fetchImpl.mock.calls[0]?.[1];
+    const headers = new Headers(init?.headers);
     expect(headers.get("Authorization")).toBe(`Bearer ${TOKEN}`);
     expect(headers.get("Cookie")).toBeNull();
     expect(headers.get("Host")).toBeNull();
