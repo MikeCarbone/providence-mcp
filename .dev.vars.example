@@ -1,0 +1,2 @@
+# Upstream HTTP API origin. Local Hono workers commonly listen on port 8787.
+API_BASE=https://api.example.com
